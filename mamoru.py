@@ -1,4 +1,4 @@
-#mamoru for git
+#mamoru for git 1
 
 import asyncio
 import random
