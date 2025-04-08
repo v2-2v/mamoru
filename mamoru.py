@@ -1,3 +1,5 @@
+#mamoru for git
+
 import asyncio
 import random
 import discord
