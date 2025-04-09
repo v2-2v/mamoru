@@ -9,7 +9,7 @@ import json
 import ast
 import os
 
-mode="sub"
+mode="gati"
 #gati or sub
 with open(f"data/setting/{mode}.json", "r", encoding="utf-8") as file:
     data = json.load(file)  # JSONデータを辞書として読み込む
