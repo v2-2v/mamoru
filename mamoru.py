@@ -609,7 +609,7 @@ async def sss(ctx):
       return
  channel=bot.get_channel(logchid)
  await channel.send("使い方のセットアップ")
- file=open(f"data/tukaikata.txt","r", encoding='utf-8')
+ file=open(f"tukaikata.txt","r", encoding='utf-8')
  welcome=file.read()
  file.close()
  embed = discord.Embed(
