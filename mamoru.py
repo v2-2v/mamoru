@@ -1,4 +1,4 @@
-#mamoru for git 1
+#mamoru for git
 
 import asyncio
 import random
@@ -9,9 +9,12 @@ import json
 import ast
 import os
 
-mode="sub"
+mode=input("gati or sub")
+if mode=="":
+    mode="sub"
+print(mode,"で起動します")
 #gati or sub
-with open(f"data/setting/{mode}.json", "r", encoding="utf-8") as file:
+with open(f"../data/setting/{mode}.json", "r", encoding="utf-8") as file:
     data = json.load(file)  # JSONデータを辞書として読み込む
 tukaikatachid=data["tukaikatachid"]
 kadaichid=data["kadaichid"]
@@ -29,13 +32,13 @@ guildid=data["guildid"]
 TOKEN=data["TOKEN"]
 
 
-if not os.path.exists('data/count.json'):
+if not os.path.exists('../data/count.json'):
     print("no file count.json")
     exit(1)
 bot = commands.Bot(command_prefix="!", intents=discord.Intents.all(),help_command=None)
 @bot.event
 async def on_ready():
-    print("start 9.0- mode",mode)
+    print("start GIT mode",mode)
     global today
     today = datetime.datetime.now().day #1ケタday
     await bot.change_presence(activity=discord.Game(f"{today}日だお"))
@@ -56,7 +59,7 @@ async def loop():
         await kda()
         await kdl()
         await auto_set() #->set課題へ飛ばす
-        with open("data/task.json", 'rb') as file:
+        with open("../data/task.json", 'rb') as file:
             file_data = discord.File(file)
         channel = bot.get_channel(logchid)
         await channel.send(file=file_data)
@@ -71,7 +74,7 @@ async def h(ctx):
  await auto_set()
 
 def count(user,type):
-    with open("data/count.json","r",encoding="utf-8") as file:
+    with open("../data/count.json","r",encoding="utf-8") as file:
         data = json.load(file)
     find=False
     for hoge in data:
@@ -84,7 +87,7 @@ def count(user,type):
             "type":type,
             "count":1,
         })
-    with open("data/count.json","w",encoding="utf-8") as file:
+    with open("../data/count.json","w",encoding="utf-8") as file:
         json.dump(data, file, indent=4, ensure_ascii=False)
 @bot.command()
 async def ao(ctx,name,youbi,target):
@@ -104,7 +107,7 @@ async def ao(ctx,name,youbi,target):
             "targetday": target,
             "name": name
         }
-        with open("data/onde.json", "r", encoding="utf-8") as file:
+        with open("../data/onde.json", "r", encoding="utf-8") as file:
             data = json.load(file)  # JSONデータを辞書として読み込む
         find=False
         for ff in data:
@@ -116,7 +119,7 @@ async def ao(ctx,name,youbi,target):
         if not find:
             data.append(new_data)
             await ctx.send(f"登録完了です。__{name}__という科目を__{youbi}曜日__になった瞬間自動でセットし、__{target}日後__を締め切りとして設定しました。")
-        with open("data/onde.json", "w", encoding="utf-8") as file:
+        with open("../data/onde.json", "w", encoding="utf-8") as file:
             json.dump(data, file, indent=4, ensure_ascii=False)
     except FileNotFoundError:
         await ctx.send("onde.jsonが見つかりません")
@@ -125,14 +128,14 @@ async def auto_set():
     tomorrow = datetime.date.today()
     today = tomorrow.strftime('%m%d') #今日をstr 4ケタで取得
     try:
-        with open("data/auto.json", "r", encoding="utf-8") as file:
+        with open("../data/auto.json", "r", encoding="utf-8") as file:
             data = json.load(file)  # JSONデータを辞書として読み込む
         for line in data:
             if line["pushday"]==today and  line["pushed"]=="no":
                 line["pushed"]="yes"
                 await setkadai(line["name"],line["end"])
                 
-        with open("data/auto.json", "w", encoding="utf-8") as file:
+        with open("../data/auto.json", "w", encoding="utf-8") as file:
             json.dump(data, file, indent=4, ensure_ascii=False)
     except FileNotFoundError:
         channel = bot.get_channel(logchid)
@@ -142,7 +145,7 @@ async def auto_set():
         weekdays = ["月", "火", "水", "木", "金", "土", "日"]
         sss = datetime.datetime.today().weekday()
         youbi=weekdays[sss] #今の月火水木金土日 
-        with open("data/onde.json", "r", encoding="utf-8") as file:
+        with open("../data/onde.json", "r", encoding="utf-8") as file:
             data = json.load(file)  # JSONデータを辞書として読み込む
         todaymmdd = datetime.date.today().strftime("%m%d")
         for line in data:
@@ -150,7 +153,7 @@ async def auto_set():
                 targetday=int(line["targetday"])
                 targetdaymmdd=(datetime.date.today()+datetime.timedelta(days=targetday)).strftime("%m%d")
                 await setkadai(line["name"]+" "+todaymmdd+"オンデマンド",str(targetdaymmdd))
-        with open("data/onde.json", "w", encoding="utf-8") as file:
+        with open("../data/onde.json", "w", encoding="utf-8") as file:
             json.dump(data, file, indent=4, ensure_ascii=False)
     except FileNotFoundError:
         channel = bot.get_channel(logchid)
@@ -169,7 +172,7 @@ async def setkadai(kadai,day): ##自動
 }
    try:
         # ファイルが存在する場合、データを読み込む
-        with open("data/task.json", "r", encoding="utf-8") as file:
+        with open("../data/task.json", "r", encoding="utf-8") as file:
             file_content = file.read()
         if file_content:
             olddata = json.loads(file_content)
@@ -186,7 +189,7 @@ async def setkadai(kadai,day): ##自動
         return
    else:
         olddata.append(data)
-        with open("data/task.json", "w", encoding="utf-8") as file: # ファイルへの書き込み
+        with open("../data/task.json", "w", encoding="utf-8") as file: # ファイルへの書き込み
             json.dump(olddata, file, ensure_ascii=False ,indent=4)
    embed = discord.Embed(
         title=f"{kadai}",
@@ -205,19 +208,19 @@ async def setkadai(kadai,day): ##自動
 async def kdl():
  delday = datetime.date.today() - datetime.timedelta(days=1) #1日前
  dalday = delday.strftime('%m%d') #str 4ケタで取得
- with open('data/task.json', 'r', encoding='utf-8') as file:
+ with open('../data/task.json', 'r', encoding='utf-8') as file:
            data = json.load(file)
  for item in data:
         if str(item["task_date"]) == dalday :
             delname=item ["task_name"]
-            with open('data/task.json', 'r', encoding='utf-8') as file:
+            with open('../data/task.json', 'r', encoding='utf-8') as file:
                  tasks = json.load(file)
                  split_strings = [task for task in tasks if task["task_name"] != f"{delname}"]#科目によってデータを消す
                  newalldata = ','.join(map(str, split_strings))#[]がないstrにする ここまで正常6:19
                  newalldata=newalldata.replace("'", "\"")
                  jjdata=f"[\n{newalldata}\n]"
                  dict_obj=dict_obj = ast.literal_eval(jjdata)
-                 with open('data/task.json', 'w', encoding='utf-8') as new_json_file:
+                 with open('../data/task.json', 'w', encoding='utf-8') as new_json_file:
                      json.dump(dict_obj, new_json_file, ensure_ascii=False, indent=4)
                  channel = bot.get_channel(osirasechid)
                  await channel.send(f"1日前({delday})の課題{delname}をデータから削除")
@@ -226,7 +229,7 @@ async def kda():
     status=1
     tomorrow = datetime.date.today()
     tomorrow = tomorrow.strftime('%m%d') #明日をstr 4ケタで取得
-    with open('data/task.json', 'r', encoding='utf-8') as file:
+    with open('../data/task.json', 'r', encoding='utf-8') as file:
            data = json.load(file)
     channel = bot.get_channel(osirasechid)
     
@@ -251,7 +254,7 @@ async def kda():
     tomorrow = datetime.date.today() + datetime.timedelta(days=1)
     tomorrow = tomorrow.strftime('%m%d') #明日をstr 4ケタで取得
     channel = bot.get_channel(osirasechid)
-    with open('data/task.json', 'r', encoding='utf-8') as file:
+    with open('../data/task.json', 'r', encoding='utf-8') as file:
            data = json.load(file)
     for item in data:
         if str(item["task_date"]) == tomorrow :
@@ -283,7 +286,7 @@ async def daily(): #デイリー報告
     await channel.send(f"# 本日({www})の未終了課題一覧の報告です")
     guild = bot.get_guild(guildid)
     allmemberid = [str(member.id) for member in guild.members if not member.bot]
-    with open('data/task.json', 'r', encoding='utf-8') as file:
+    with open('../data/task.json', 'r', encoding='utf-8') as file:
            data = json.load(file)
     user_tasks = {user: [] for user in allmemberid}
     result=""
@@ -311,7 +314,7 @@ async def myt(ctx):
         i=0
         await ctx.send(f"{user}の未終了課題一覧です")
         allmemberid=[f'{user.id}']
-        with open('data/test.json', 'r', encoding='utf-8') as file:
+        with open('../data/test.json', 'r', encoding='utf-8') as file:
            data = json.load(file)
         user_tasks = {user: [] for user in allmemberid}
         result=""
@@ -347,7 +350,7 @@ async def my(ctx):
         i=0
         await ctx.send(f"{user}の未終了課題一覧です")
         allmemberid=[f'{user.id}']
-        with open('data/task.json', 'r', encoding='utf-8') as file:
+        with open('../data/task.json', 'r', encoding='utf-8') as file:
            data = json.load(file)
         user_tasks = {user: [] for user in allmemberid}
         result=""
@@ -416,7 +419,7 @@ async def o(ctx,kadai,day):
 }
    try:
         # ファイルが存在する場合、データを読み込む
-        with open("data/task.json", "r", encoding="utf-8") as file:
+        with open("../data/task.json", "r", encoding="utf-8") as file:
             file_content = file.read()
         if file_content:
             olddata = json.loads(file_content)
@@ -435,7 +438,7 @@ async def o(ctx,kadai,day):
         return
    else:
         olddata.append(data)
-        with open("data/task.json", "w", encoding="utf-8") as file: # ファイルへの書き込み
+        with open("../data/task.json", "w", encoding="utf-8") as file: # ファイルへの書き込み
             json.dump(olddata, file, ensure_ascii=False ,indent=4)
    embed = discord.Embed(
         title=f"{kadai}",
@@ -474,7 +477,7 @@ async def t(ctx,kadai,day):
 }
    try:
         # ファイルが存在する場合、データを読み込む
-        with open("data/test.json", "r", encoding="utf-8") as file:
+        with open("../data/test.json", "r", encoding="utf-8") as file:
             file_content = file.read()
         if file_content:
             olddata = json.loads(file_content)
@@ -493,7 +496,7 @@ async def t(ctx,kadai,day):
         return
    else:
         olddata.append(data)
-        with open("data/test.json", "w", encoding="utf-8") as file: # ファイルへの書き込み
+        with open("../data/test.json", "w", encoding="utf-8") as file: # ファイルへの書き込み
             json.dump(olddata, file, ensure_ascii=False ,indent=4)
    embed = discord.Embed(
         title=f"{kadai}",
@@ -510,7 +513,7 @@ async def t(ctx,kadai,day):
 
 @bot.event
 async def on_raw_reaction_add(payload):
-    json_name="data/task.json"
+    json_name="../data/task.json"
     channel = bot.get_channel(payload.channel_id)
     message = await channel.fetch_message(payload.message_id)
     user = await bot.fetch_user(payload.user_id)
@@ -519,7 +522,7 @@ async def on_raw_reaction_add(payload):
     embed = message.embeds[0]
     title = embed.title
     if "テスト" in title:
-        json_name="data/test.json"
+        json_name="../data/test.json"
     reaction = discord.utils.get(message.reactions, emoji=payload.emoji.name)
     if user==bot.user:
         return
@@ -587,7 +590,7 @@ async def on_raw_reaction_add(payload):
        newalldata=newalldata.replace("'", "\"")
        jjdata=f"[\n{newalldata}\n]"
        dict_obj=dict_obj = ast.literal_eval(jjdata)
-       with open('data/task.json', 'w', encoding='utf-8') as new_json_file:
+       with open('../data/task.json', 'w', encoding='utf-8') as new_json_file:
            json.dump(dict_obj, new_json_file, ensure_ascii=False, indent=4)
        day=embed.description
        embed.clear_fields()   
