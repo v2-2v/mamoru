@@ -9,7 +9,7 @@ import json
 import ast
 import os
 
-mode="gati"
+mode="sub"
 #gati or sub
 with open(f"data/setting/{mode}.json", "r", encoding="utf-8") as file:
     data = json.load(file)  # JSONデータを辞書として読み込む
@@ -401,7 +401,7 @@ async def o(ctx,kadai,day):
    except ValueError:
       await ctx.reply("4桁半角数字の正しい期日を入力してください")
       await ctx.message.add_reaction("💩")
-      
+      return
    if  "テスト" in kadai:
        await ctx.reply("テストを定義するには!tを使ってください")
        return
