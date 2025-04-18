@@ -29,9 +29,9 @@ GUILDS_API_URL = 'https://discord.com/api/users/@me/guilds'
 def home():
     if 'user' not in session:
         return '<a href="/login">Discordでログイン</a>'
-
+    guilds = session['guilds'] 
     user = session['user']
-    return f"hello {user['global_name']}"
+    return f"hello {user['global_name']} {str(guilds)}"
 
 @app.route('/login')
 def login():
