@@ -3,8 +3,10 @@ import requests
 import os
 from datetime import timedelta
 from dotenv import load_dotenv
+from pathlib import Path
 
-load_dotenv()
+env_path = Path(__file__).resolve().parent.parent / '.env'
+load_dotenv(dotenv_path=env_path)
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # セッション管理用のキー（開発用）
