@@ -14,8 +14,8 @@ CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 CLIENT_ID = os.getenv("CLIENT_ID")
 TARGET_DISCORD_SERVER=os.getenv("SERVER_ID")
 app.secret_key = os.getenv("SECRET_KEY")
-REDIRECT_URI = 'http://localhost:5100/callback'
-AUTH_URL = "https://discord.com/oauth2/authorize?client_id=1149037728449699861&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A5100%2Fcallback&scope=identify+guilds"
+REDIRECT_URI = os.getenv("REDIRECT_URL")
+AUTH_URL = f"https://discord.com/oauth2/authorize?client_id=1149037728449699861&response_type=code&redirect_uri={REDIRECT_URI}&scope=identify+guilds"
 
 TOKEN_URL = 'https://discord.com/api/oauth2/token'
 API_URL = 'https://discord.com/api/users/@me'
@@ -84,7 +84,79 @@ def callback():
 
     return redirect(url_for("sp1"))
 
-@app.route("/sp2")
+
+@app.route("/sp4")
+def sp4():
+    ###正規チェック
+    if 'user' not in session:
+        return '<a href="/login">Discordでログイン</a>'
+    if check_true_member(session["guilds"])==False:
+        return "ERROR"
+    ###正規チェック
+    arg_ond_name = request.args.get('ond_name', '')
+    body=""
+    with open("../data/onde.json", "r", encoding="utf-8") as file:
+            data = json.load(file)  # JSONデータを辞書として読み込む
+    for ff in data:
+        if ff["name"]==arg_ond_name:
+            data.remove(ff)
+            body+=f"<h3>{arg_ond_name}を削除しました</h3>"
+    
+    with open("../data/onde.json", "w", encoding="utf-8") as file:
+            json.dump(data, file, indent=4, ensure_ascii=False)
+    return render_template("base.html",title=f"削除完了",body=body)
+
+@app.route("/sp3",methods=["GET","POST"])
+def sp3():
+    ###正規チェック
+    if 'user' not in session:
+        return '<a href="/login">Discordでログイン</a>'
+    if check_true_member(session["guilds"])==False:
+        return "ERROR"
+    ###正規チェック
+    addstyle="""
+        table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid #333;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    """
+    if request.method == 'GET':
+        body="""
+            <table>
+                <tr>
+                <th>科目名</th>
+                <th>セットする曜日</th>
+                <th>何日後</th>
+                <th></th>
+                <th></th>
+                </tr>
+        """
+        with open("../data/onde.json", "r", encoding="utf-8") as file:
+            data = json.load(file)  # JSONデータを辞書として読み込む
+        for kadai in data:
+            body+=f"""
+            <tr>
+            <td>{kadai["name"]}</td>
+            <td>{kadai["pushyoubi"]}</td>
+            <td>{kadai["targetday"]}</td>
+            <td><a href="sp2?ond_name={kadai["name"]}&weak={kadai["pushyoubi"]}&date={kadai["targetday"]}">変更</a></td>
+            <td><a href="sp4?ond_name={kadai["name"]}">削除</a></td>
+            </tr>
+            """
+        body+="</table>"
+
+        return render_template("base.html",title=f"設定変更",body=body,addstyle=addstyle)
+
+
+@app.route("/sp2",methods=["GET","POST"])
 def sp2():
     ###正規チェック
     if 'user' not in session:
@@ -92,9 +164,73 @@ def sp2():
     if check_true_member(session["guilds"])==False:
         return "ERROR"
     ###正規チェック
-    body="sss"
+    if request.method == 'POST':
+        subject_name = request.form.get('ond_name')
+        weekday = request.form.get('weak')
+        days_later = request.form.get('date')
+        if subject_name == "" or (not weekday in ["月","火","水","木","金","土"]) or (not days_later in ["1","2","3","4","5","6","7"]):
+            return "error"
+
+        new_data={
+            "pushyoubi": weekday,
+            "targetday": days_later,
+            "name": subject_name
+        }
+        with open("../data/onde.json", "r", encoding="utf-8") as file:
+            data = json.load(file)  # JSONデータを辞書として読み込む
+        
+        find=False
+        for ff in data:
+            if ff["name"]==new_data["name"]:
+                ff["pushyoubi"]=new_data["pushyoubi"]
+                ff["targetday"]=new_data["targetday"]
+                find=True
+                body=f"<h3>{subject_name} という科目を {weekday}曜日 になった瞬間自動でセットし、 その日から{days_later}日後 を締め切りとして設定変更しました。</h3>"
+        if not find:
+            data.append(new_data)
+            body=f"<h3>{subject_name} という科目を {weekday}曜日 になった瞬間自動でセットし、 その日から{days_later}日後 を締め切りとして設定しました。</h3>"
+
+        with open("../data/onde.json", "w", encoding="utf-8") as file:
+            json.dump(data, file, indent=4, ensure_ascii=False)
+        
+        return render_template("base.html",title=f"設定完了",body=body)
+    arg_ond_name = request.args.get('ond_name', '')
+    arg_weak = request.args.get('weak', '')
+    arg_date = request.args.get('date', '')
+    weak_select=""
+    for www in ["月","火","水","木","金","土"]:
+        if www == arg_weak:
+            weak_select+=f'<option value="{www}" selected>{www}曜日</option>'
+        else:
+            weak_select+=f'<option value="{www}">{www}曜日</option>'
+    date_select=""
+    for www in ["7","6","5","4","3","2","1"]:
+        if www == arg_date:
+            date_select+=f'<option value="{www}" selected>{www}日後</option>'
+        else:
+            date_select+=f'<option value="{www}">{www}日後</option>'
+    body=f"""
+    <form action="/sp2" method="post">
+    <label for="ond_name">科目名は？</label><br>
+    <input type="text" id="ond_name" name="ond_name" value="{arg_ond_name}" required><br><br>
+
+    <label for="weak">何曜日になった瞬間自動定義？</label><br>
+    <select id="weak" name="weak">
+    {weak_select}
+    </select><br><br>
+
+    <label for="date">何日後を締め切り？</label><br>
+    <select id="date" name="date">
+    {date_select}
+    </select><br><br>
+
+    <input type="submit" value="設定する">
+    </form>
+
+    """
     
-    return render_template("base.html",title=f"オンデマンドの自動登録を設定する",body=body)
+    return render_template("base.html",title=f"自動登録を設定する",body=body)
+
 @app.route("/sp1")
 def sp1():
     ###正規チェック
@@ -132,7 +268,6 @@ def sp1():
             <td>{ss["date"]}</td>
         </tr>
         """
-    print(sorted_data)
     body+=f"""<h4>あなたの課題</h4><p>課題数{i}</p>"""
     body+=kadai_data
     body+="""
