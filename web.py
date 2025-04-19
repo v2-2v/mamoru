@@ -83,6 +83,18 @@ def callback():
     session['user'] = user_data
 
     return redirect(url_for("sp1"))
+
+@app.route("/sp2")
+def sp2():
+    ###正規チェック
+    if 'user' not in session:
+        return '<a href="/login">Discordでログイン</a>'
+    if check_true_member(session["guilds"])==False:
+        return "ERROR"
+    ###正規チェック
+    body="sss"
+    
+    return render_template("base.html",title=f"オンデマンドの自動登録を設定する",body=body)
 @app.route("/sp1")
 def sp1():
     ###正規チェック
