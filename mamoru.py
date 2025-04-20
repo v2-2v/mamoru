@@ -148,7 +148,7 @@ async def auto_set():
             if youbi == line["pushyoubi"]: #対象の日付が今日なら
                 targetday=int(line["targetday"])
                 targetdaymmdd=(datetime.date.today()+datetime.timedelta(days=targetday)).strftime("%m%d")
-                await setkadai(line["name"]+" "+todaymmdd+"オンデマンド",str(targetdaymmdd))
+                await setkadai(line["name"]+" "+todaymmdd,str(targetdaymmdd))
         with open("../data/onde.json", "w", encoding="utf-8") as file:
             json.dump(data, file, indent=4, ensure_ascii=False)
     except FileNotFoundError:
