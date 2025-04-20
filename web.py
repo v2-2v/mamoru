@@ -351,4 +351,4 @@ def logout():
     return redirect(url_for('home'))
 
 if __name__ == '__main__':
-    app.run(debug=True,port=5100,host="0.0.0.0")
+    app.run(port=5100,host="0.0.0.0")
