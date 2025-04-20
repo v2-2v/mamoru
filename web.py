@@ -120,6 +120,10 @@ def sp4():
     with open("../data/onde.json", "w", encoding="utf-8") as file:
             json.dump(data, file, indent=4, ensure_ascii=False)
     add_log(session['user']["global_name"],msg)
+    message = {
+            "content": msg
+        }
+    requests.post(WEBHOOK_URL, json=message)
     return render_template("base.html",title=f"削除完了",body=body)
 
 @app.route("/sp3")
@@ -211,6 +215,10 @@ def sp2():
         with open("../data/onde.json", "w", encoding="utf-8") as file:
             json.dump(data, file, indent=4, ensure_ascii=False)
         add_log(session['user']["global_name"],msg)
+        message = {
+            "content": msg
+        }
+        requests.post(WEBHOOK_URL, json=message)
         return render_template("base.html",title=f"設定完了",body=body)
     arg_ond_name = request.args.get('ond_name', '')
     arg_weak = request.args.get('weak', '')
