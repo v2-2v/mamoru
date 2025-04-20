@@ -59,10 +59,6 @@ async def loop():
         await kda()
         await kdl()
         await auto_set() #->set課題へ飛ばす
-        with open("../data/task.json", 'rb') as file:
-            file_data = discord.File(file)
-        channel = bot.get_channel(logchid)
-        await channel.send(file=file_data)
 
 @bot.command()
 async def h(ctx):
@@ -540,8 +536,6 @@ async def on_raw_reaction_add(payload):
          else: #userがいたら,の後に追加
              split_strings=juser.split(",") #strをリストに整形
              if str(user.id) in split_strings:
-                channel = bot.get_channel(kanrishachid)
-                await channel.send(f"{title}で{user.name}が二重登録しようとしていました")
                 return
              split_strings.append(str(user.id)) #リストにuser.idを追加
              newjuser = ','.join(map(str, split_strings)) #[]がないstrにする
@@ -610,8 +604,6 @@ async def on_raw_reaction_add(payload):
 async def sss(ctx):
  if ctx.channel.id != kanrishachid:
       return
- channel=bot.get_channel(logchid)
- await channel.send("使い方のセットアップ")
  file=open(f"tukaikata.txt","r", encoding='utf-8')
  welcome=file.read()
  file.close()
