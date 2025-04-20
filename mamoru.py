@@ -152,7 +152,7 @@ async def auto_set():
             if youbi == line["pushyoubi"]: #対象の日付が今日なら
                 targetday=int(line["targetday"])
                 targetdaymmdd=(datetime.date.today()+datetime.timedelta(days=targetday)).strftime("%m%d")
-                await setkadai(line["name"]+"-"+todaymmdd,str(targetdaymmdd))
+                await setkadai(line["name"]+" "+todaymmdd+"オンデマンド",str(targetdaymmdd))
         with open("../data/onde.json", "w", encoding="utf-8") as file:
             json.dump(data, file, indent=4, ensure_ascii=False)
     except FileNotFoundError:
@@ -371,7 +371,7 @@ async def my(ctx):
         sorted_lines = sorted([line for line in lines if line.rfind('(') != -1 and line.rfind(')') != -1], 
                       key=lambda line: int(line[line.rfind('(')+1:line.rfind(')')]), reverse=True)
         sorted_data = '\n'.join(sorted_lines)
-        await ctx.send(name+sorted_data+f"\n課題数: {i}\n!mytでテストを表示できます")
+        await ctx.send(name+sorted_data+f"\n課題数: {i}\n [ここ](https://server.porgy-kitchen.ts.net/)で見たり自動登録が設定できます")
         count(f"{user.id}","!myコマンド使用")
     # サーバーチャンネルの場合は無視
     else:
