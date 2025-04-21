@@ -17,7 +17,7 @@ mamoru-env
 │       ├── gati.json
 │       └── sub.json
 │
-└── mamoru
+└── mamoru <--- this repository
     ├── .gitignore
     ├── mamoru.py
     ├── README.md
