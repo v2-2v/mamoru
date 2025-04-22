@@ -8,9 +8,9 @@ mamoruはDiscordとWEBで管理できる課題管理ツールです
 # System Tree
 ```
 mamoru-env
-│  .env
+│  .env <--Get from https://github.com/v2-2v/mamoru-env
 │
-├── data
+├── data <--Get from https://github.com/v2-2v/mamoru-env
 │   ├── auto.json
 │   ├── count.json
 │   ├── onde.json
@@ -27,7 +27,8 @@ mamoru-env
     ├── mamoru.py
     ├── README.md
     ├── tukaikata.txt
-    ├── web.py
+    ├── requirements.txt
+    ├── mamoru.py
     └── templates
         └── base.html
 ```
