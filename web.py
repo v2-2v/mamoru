@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 import json
 from datetime import datetime
+import urllib.parse
 
 #LOG ADD add_log(session['user']["global_name"],"msg")
 
@@ -167,8 +168,8 @@ def sp3():
             <td>{kadai["name"]}</td>
             <td>{kadai["pushyoubi"]}</td>
             <td>{kadai["targetday"]}</td>
-            <td><a href="sp2?ond_name={kadai["name"]}&weak={kadai["pushyoubi"]}&date={kadai["targetday"]}">変更</a></td>
-            <td><a href="sp4?ond_name={kadai["name"]}">削除</a></td>
+            <td><a href="sp2?ond_name={urllib.parse.quote(kadai["name"])}&weak={kadai["pushyoubi"]}&date={kadai["targetday"]}">変更</a></td>
+            <td><a href="sp4?ond_name={urllib.parse.quote(kadai["name"])}">削除</a></td>
             </tr>
             """
         body+="</table>"
@@ -290,7 +291,7 @@ def sp1():
     for ss in sorted_data:
         kadai_data+=f"""
         <tr>
-            <td>{ss["name"]}</td>
+            <td>{ss["name"].replace("<","").replace(">","")}</td>
             <td>{ss["date"]}</td>
         </tr>
         """
@@ -320,7 +321,7 @@ def sp1():
     for ss in sorted_data:
         test_data+=f"""
         <tr>
-            <td>{ss["name"]}</td>
+            <td>{ss["name"].replace("<","").replace(">","")}</td>
             <td>{ss["date"]}</td>
         </tr>
         """
