@@ -8,6 +8,8 @@ import datetime
 import json
 import ast
 import os
+from dotenv import load_dotenv
+from pathlib import Path
 
 mode=input("gati or sub: ")
 if mode=="":
@@ -17,7 +19,10 @@ print(mode,"で起動します")
 with open(f"../data/setting/{mode}.json", "r", encoding="utf-8") as file:
     data = json.load(file)  # JSONデータを辞書として読み込む
 
-web_url="https://server.porgy-kitchen.ts.net/"
+env_path = Path(__file__).resolve().parent.parent / '.env'
+load_dotenv(dotenv_path=env_path)
+
+web_url= os.getenv("REDIRECT_URL").replace("callback","")
 tukaikatachid=data["tukaikatachid"]
 kadaichid=data["kadaichid"]
 cmdchid=data["cmdchid"]
@@ -611,7 +616,7 @@ async def sss(ctx):
  file.close()
  embed = discord.Embed(
         title="ようこそ",
-        description=welcome
+        description=welcome+f"\n# 自動登録は[ここ]({web_url})でできます"
         )
  channel=bot.get_channel(tukaikatachid)
  await channel.send(embed=embed)

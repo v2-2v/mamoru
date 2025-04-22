@@ -19,5 +19,3 @@
 ↓↓↓パッチノート↓↓↓
 
 WEB上での自動登録機能を追加しました
-
-# 自動登録は[ここ](https://server.porgy-kitchen.ts.net/sp2)でできます
