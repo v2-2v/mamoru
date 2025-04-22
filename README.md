@@ -43,6 +43,9 @@ mamoru-env
 - 自動定義を閲覧、削除する
 - Webhookによる不正ログイン通知を行う
 
+# setup
+
+https://github.com/v2-2v/mamoru-env
 
 # update
 `git pull origin main`
