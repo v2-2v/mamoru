@@ -28,7 +28,7 @@ mamoru-env
     ├── README.md
     ├── tukaikata.txt
     ├── requirements.txt
-    ├── mamoru.py
+    ├── web.py
     └── templates
         └── base.html
 ```
