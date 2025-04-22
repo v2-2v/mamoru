@@ -524,8 +524,6 @@ async def on_raw_reaction_add(payload):
         return
     embed = message.embeds[0]
     title = embed.title
-    if "テスト" in title:
-        json_name="../data/test.json"
     reaction = discord.utils.get(message.reactions, emoji=payload.emoji.name)
     if user==bot.user:
         return
