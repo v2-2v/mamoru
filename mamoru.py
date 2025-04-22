@@ -456,9 +456,6 @@ async def o(ctx, kadai, day):
         await ctx.reply("4桁半角数字の正しい期日を入力してください")
         await ctx.message.add_reaction("💩")
         return
-    if "テスト" in kadai:
-        await ctx.reply("テストを定義するには!tを使ってください")
-        return
     random_number = random.randint(0, 318)
     if random_number == 77:
         channel = bot.get_channel(cmdchid)
