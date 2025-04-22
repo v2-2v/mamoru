@@ -572,10 +572,15 @@ async def on_raw_reaction_add(payload):
             json.dump(data, file, indent=4, ensure_ascii=False)
            return
     elif str(reaction.emoji) == "❌" : ##
+       if channel.id==testchid:
+            json_name="../data/test.json"
+       else:
+            json_name="../data/task.json"
        embed = message.embeds[0]
        title = embed.title
        with open(json_name, 'r', encoding='utf-8') as file:
            tasks = json.load(file)
+       mention_text=""
        for item in tasks:
         if str(item["task_name"]) == str(title):
          juser = item["user"] #JSONから入手したuserのstr
@@ -591,7 +596,7 @@ async def on_raw_reaction_add(payload):
        newalldata=newalldata.replace("'", "\"")
        jjdata=f"[\n{newalldata}\n]"
        dict_obj=dict_obj = ast.literal_eval(jjdata)
-       with open('../data/task.json', 'w', encoding='utf-8') as new_json_file:
+       with open(json_name, 'w', encoding='utf-8') as new_json_file:
            json.dump(dict_obj, new_json_file, ensure_ascii=False, indent=4)
        day=embed.description
        embed.clear_fields()   
