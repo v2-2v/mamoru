@@ -9,13 +9,15 @@ import json
 import ast
 import os
 
-mode=input("gati or sub")
+mode=input("gati or sub: ")
 if mode=="":
     mode="sub"
 print(mode,"で起動します")
 #gati or sub
 with open(f"../data/setting/{mode}.json", "r", encoding="utf-8") as file:
     data = json.load(file)  # JSONデータを辞書として読み込む
+
+web_url="https://server.porgy-kitchen.ts.net/"
 tukaikatachid=data["tukaikatachid"]
 kadaichid=data["kadaichid"]
 cmdchid=data["cmdchid"]
@@ -367,7 +369,7 @@ async def my(ctx):
         sorted_lines = sorted([line for line in lines if line.rfind('(') != -1 and line.rfind(')') != -1], 
                       key=lambda line: int(line[line.rfind('(')+1:line.rfind(')')]), reverse=True)
         sorted_data = '\n'.join(sorted_lines)
-        await ctx.send(name+sorted_data+f"\n課題数: {i}\n [ここ](https://server.porgy-kitchen.ts.net/)で見たり自動登録が設定できます")
+        await ctx.send(name+sorted_data+f"\n課題数: {i}\n [ここ]({web_url})で見たり自動登録が設定できます")
         count(f"{user.id}","!myコマンド使用")
     # サーバーチャンネルの場合は無視
     else:
