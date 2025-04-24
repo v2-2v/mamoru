@@ -21,7 +21,7 @@ app.secret_key = os.getenv("SECRET_KEY")
 REDIRECT_URI = os.getenv("REDIRECT_URL")
 WEBHOOK_URL=os.getenv("WEBHOOK_URL")
 
-AUTH_URL = f"https://discord.com/oauth2/authorize?client_id=1149037728449699861&response_type=code&redirect_uri={REDIRECT_URI}&scope=identify+guilds"
+AUTH_URL = f"https://discord.com/oauth2/authorize?client_id={CLIENT_ID}1&response_type=code&redirect_uri={REDIRECT_URI}&scope=identify+guilds"
 
 TOKEN_URL = 'https://discord.com/api/oauth2/token'
 API_URL = 'https://discord.com/api/users/@me'
