@@ -94,7 +94,9 @@ def callback():
         requests.post(WEBHOOK_URL, json=message)
         return "ERROR" #!-- Alart --!#
     session.permanent = True
-    session['guilds'] = guilds_data
+    for guild in guilds_data:
+        if guild["id"]==TARGET_DISCORD_SERVER:
+            session['guilds'] = guild
     session['user'] = user_data
     add_log(session['user']["global_name"],"login")
     return redirect(url_for("sp1"))
