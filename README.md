@@ -36,13 +36,17 @@ mamoru-env
 - 課題、テストをセットする
 - 課題、テスト題に対し、リアクションで取り組み、取り組み完了を操作
 - あなたのの課題、テストを見る
-- 課題をセットした貢献数をカウントする
+-課題をセットした貢献数をカウントする
+<img width="484" alt="スクリーンショット 2025-05-31 13 32 02" src="https://github.com/user-attachments/assets/3dba7fc7-4a47-454e-bd69-1b14dad2c0ba" />
+
 
 # WEBの機能
 - あなたの課題、テストを見る
 - 自動定義を設定する
 - 自動定義を閲覧、削除する
 - Webhookによる不正ログイン通知を行う
+<img width="1701" alt="スクリーンショット 2025-05-31 13 31 12" src="https://github.com/user-attachments/assets/0d259382-308c-4762-b7b1-78ffa630510e" />
+
 
 # setup
 
