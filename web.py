@@ -368,7 +368,7 @@ def api(id):
                 "date":ss["date"]
             }
         )
-    return json.dumps(kadai_data)
+    return json.dumps(kadai_data,ensure_ascii=False,indent=4)
 
 @app.route('/logout')
 def logout():
