@@ -359,7 +359,6 @@ def api(id):
                 "date":f"{task["task_date"]}"
             })
     sorted_data = sorted(the_data, key=lambda x: x['date'],reverse=False)
-    print(sorted_data,the_data)
     kadai_data=[]
     for ss in sorted_data:
         kadai_data.append(
