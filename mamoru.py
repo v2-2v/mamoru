@@ -338,6 +338,10 @@ async def daily():  # デイリー報告
 
 
 @bot.command()
+async def myid(ctx):
+    await ctx.send(f"{ctx.author.id}")
+
+@bot.command()
 async def myt(ctx):
     # コマンドを実行したユーザーのメンション
     user = ctx.author
