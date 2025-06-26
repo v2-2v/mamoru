@@ -289,7 +289,7 @@ def sp1():
                 "date":f"{task["task_date"]}"
             })
             i+=1
-    sorted_data = sorted(the_data, key=lambda x: x['date'])
+    sorted_data = sorted(the_data, key=lambda x: x['date'],reverse=False)
     for ss in sorted_data:
         kadai_data+=f"""
         <tr>
@@ -312,7 +312,7 @@ def sp1():
                 "name":f"{test["task_name"]}",
                 "date":f"{test["task_date"]}"
             })
-    sorted_data = sorted(the_data, key=lambda x: x['date'])
+    sorted_data = sorted(the_data, key=lambda x: x['date'],reverse=False)
     test_data="""
     <table>
         <tr>
@@ -346,6 +346,29 @@ def sp1():
     }
     """
     return render_template("base.html",title=f"ようこそ {session_user['global_name']}!",body=body,addstyle=addstyle)
+
+@app.route("/api/<string:id>")
+def api(id):
+    with open('../data/task.json', 'r', encoding='utf-8') as file:
+        data = json.load(file)
+    the_data=[]
+    for task in data:
+        if id in task["user"]:
+            the_data.append({
+                "name":f"{task["task_name"]}",
+                "date":f"{task["task_date"]}"
+            })
+    sorted_data = sorted(the_data, key=lambda x: x['date'],reverse=False)
+    print(sorted_data,the_data)
+    kadai_data=[]
+    for ss in sorted_data:
+        kadai_data.append(
+            {
+                "name":ss["name"],
+                "date":ss["date"]
+            }
+        )
+    return json.dumps(kadai_data)
 
 @app.route('/logout')
 def logout():
