@@ -27,7 +27,7 @@ TOKEN_URL = 'https://discord.com/api/oauth2/token'
 API_URL = 'https://discord.com/api/users/@me'
 GUILDS_API_URL = 'https://discord.com/api/users/@me/guilds'
 
-app.permanent_session_lifetime = timedelta(days=60)  # 任意の期間に変更可
+app.permanent_session_lifetime = timedelta(days=20)  # 任意の期間に変更可
 
 def add_log(user,message):
     with open('../data/web_log.txt', 'a', encoding='utf-8') as f:

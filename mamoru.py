@@ -344,10 +344,15 @@ async def myt(ctx):
     # ユーザーが個人DMでコマンドを実行した場合
     if True:
         i = 0
-        await ctx.send(f"{user}の未終了課題一覧です")
+        await ctx.send(f"{user}の未終了テスト一覧です")
         allmemberid = [f"{user.id}"]
-        with open("../data/test.json", "r", encoding="utf-8") as file:
-            data = json.load(file)
+        try:
+            with open("../data/test.json", "r", encoding="utf-8") as file:
+                data = json.load(file)
+        except FileNotFoundError:
+            await ctx.send("テストデータがありません")
+            return
+            
         user_tasks = {user: [] for user in allmemberid}
         result = ""
         for task in data:
@@ -517,6 +522,7 @@ async def t(ctx, kadai, day):
         return
     if not "テスト" in kadai:
         await ctx.reply("最後にテストと追加してください")
+        await ctx.message.add_reaction("💩")
         return
     random_number = random.randint(0, 318)
     if random_number == 77:
@@ -532,13 +538,15 @@ async def t(ctx, kadai, day):
         else:
             olddata = []
     except FileNotFoundError:
-        channel = bot.get_channel(logchid)
-        await channel.send("ファイルを作成")
+        # ファイルが存在しない場合は空のリストで開始
         olddata = []
-    if not isinstance(
-        olddata, list
-    ):  # 既存のデータをリストに変換するか、空のリストから始める
+        # ファイルを作成
+        with open("../data/test.json", "w", encoding="utf-8") as file:
+            json.dump([], file, ensure_ascii=False, indent=4)
+    
+    if not isinstance(olddata, list):
         olddata = []
+        
     name_exists = any(
         item["task_name"] == kadai for item in olddata
     )  # 重複データのチェック（課題名をチェック）
@@ -569,97 +577,106 @@ async def t(ctx, kadai, day):
 
 @bot.event
 async def on_raw_reaction_add(payload):
-    json_name = "../data/task.json"
     channel = bot.get_channel(payload.channel_id)
     message = await channel.fetch_message(payload.message_id)
     user = await bot.fetch_user(payload.user_id)
     if user == bot.user:
         return
+    
+    # チャンネルに応じてJSONファイルを選択
+    if channel.id == testchid:
+        json_name = "../data/test.json"
+    else:
+        json_name = "../data/task.json"
+    
     embed = message.embeds[0]
     title = embed.title
     reaction = discord.utils.get(message.reactions, emoji=payload.emoji.name)
-    if user == bot.user:
-        return
+    
     if str(reaction.emoji) == "🫡":  # 参加マーク
-        with open(json_name, "r", encoding="utf-8") as file:
-            data = json.load(file)
-        embed = message.embeds[0]
-        title = embed.title
+        try:
+            with open(json_name, "r", encoding="utf-8") as file:
+                data = json.load(file)
+        except FileNotFoundError:
+            await channel.send(f"{json_name}ファイルが見つかりません")
+            return
+            
         for item in data:
             if str(item["task_name"]) == str(title):
                 juser = item["user"]  # JSONから入手したuser
                 if juser == "":  # userがいないなら
-                    newjuser = user.id
-                    str(newjuser)
+                    newjuser = str(user.id)
                 else:  # userがいたら,の後に追加
                     split_strings = juser.split(",")  # strをリストに整形
                     if str(user.id) in split_strings:
                         return
                     split_strings.append(str(user.id))  # リストにuser.idを追加
                     newjuser = ",".join(map(str, split_strings))  # []がないstrにする
-                # print(f"新規書き込みは{newjuser}") #ここまで完成5:18
-                for item in data:
-                    if str(item["task_name"]) == str(title):
-                        item["user"] = str(newjuser)
-                        with open(json_name, "w", encoding="utf-8") as file:
-                            json.dump(data, file, indent=4, ensure_ascii=False)
-                return
-
-    elif str(reaction.emoji) == "☑":
-        with open(json_name, "r", encoding="utf-8") as file:
-            data = json.load(file)
-        embed = message.embeds[0]
-        title = embed.title
-        for item in data:
-            if str(item["task_name"]) == str(title):
-                juser = item["user"]  # JSONから入手したuser
-                split_strings = juser.split(",")  # strをリストに整形
-                split_strings.remove(str(user.id))  # リストからuser.idを消す
-                newjuser = ",".join(map(str, split_strings))  # []がないstrにする
-        for item in data:
-            if str(item["task_name"]) == str(title):
-                item["user"] = str(newjuser)
+                
+                item["user"] = newjuser
                 with open(json_name, "w", encoding="utf-8") as file:
                     json.dump(data, file, indent=4, ensure_ascii=False)
                 return
-    elif str(reaction.emoji) == "❌":  ##
-        if channel.id == testchid:
-            json_name = "../data/test.json"
-        else:
-            json_name = "../data/task.json"
-        embed = message.embeds[0]
-        title = embed.title
-        with open(json_name, "r", encoding="utf-8") as file:
-            tasks = json.load(file)
+
+    elif str(reaction.emoji) == "☑":
+        try:
+            with open(json_name, "r", encoding="utf-8") as file:
+                data = json.load(file)
+        except FileNotFoundError:
+            await channel.send(f"{json_name}ファイルが見つかりません")
+            return
+            
+        for item in data:
+            if str(item["task_name"]) == str(title):
+                juser = item["user"]  # JSONから入手したuser
+                if juser == "":
+                    return
+                split_strings = juser.split(",")  # strをリストに整形
+                if str(user.id) not in split_strings:
+                    return
+                split_strings.remove(str(user.id))  # リストからuser.idを消す
+                newjuser = ",".join(map(str, split_strings))  # []がないstrにする
+                item["user"] = newjuser
+                with open(json_name, "w", encoding="utf-8") as file:
+                    json.dump(data, file, indent=4, ensure_ascii=False)
+                return
+                
+    elif str(reaction.emoji) == "❌":
+        try:
+            with open(json_name, "r", encoding="utf-8") as file:
+                tasks = json.load(file)
+        except FileNotFoundError:
+            await channel.send(f"{json_name}ファイルが見つかりません")
+            return
+            
         mention_text = ""
         for item in tasks:
             if str(item["task_name"]) == str(title):
                 juser = item["user"]  # JSONから入手したuserのstr
-
-                str_list = juser.split(",")
-                userid_list = [item for item in str_list]
-                mentions = [f"<@{user_id}>" for user_id in userid_list]
-                mention_text = " ".join(mentions)
+                if juser != "":
+                    str_list = juser.split(",")
+                    userid_list = [item for item in str_list if item != ""]
+                    mentions = [f"<@{user_id}>" for user_id in userid_list]
+                    mention_text = " ".join(mentions)
+                break
+                
         split_strings = [
             task for task in tasks if task["task_name"] != f"{title}"
         ]  # 科目によってデータを消す
-        newalldata = ",".join(
-            map(str, split_strings)
-        )  # []がないstrにする ここまで正常6:19
-        newalldata = newalldata.replace("'", '"')
-        newalldata = newalldata.replace("},{", "},\n\n{")
-        newalldata = newalldata.replace("'", '"')
-        jjdata = f"[\n{newalldata}\n]"
-        dict_obj = dict_obj = ast.literal_eval(jjdata)
-        with open(json_name, "w", encoding="utf-8") as new_json_file:
-            json.dump(dict_obj, new_json_file, ensure_ascii=False, indent=4)
+        
+        if not split_strings:
+            # 空のリストの場合
+            with open(json_name, "w", encoding="utf-8") as new_json_file:
+                json.dump([], new_json_file, ensure_ascii=False, indent=4)
+        else:
+            with open(json_name, "w", encoding="utf-8") as new_json_file:
+                json.dump(split_strings, new_json_file, ensure_ascii=False, indent=4)
+                
         day = embed.description
         embed.clear_fields()
         embed.description = f"{user.name}によって{title}({day})がクローズされました\nこのメッセージは5秒後に消えます"
         await message.edit(embed=embed)
         await reaction.message.clear_reactions()
-        embed = message.embeds[0]
-        title = embed.title
         await asyncio.sleep(5)
         await message.delete()  # 2.0追加りあくしょん消す
         channel = bot.get_channel(osirasechid)
