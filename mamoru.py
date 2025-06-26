@@ -374,7 +374,7 @@ async def myt(ctx):
         sorted_lines = sorted(
             [line for line in lines if line.rfind("(") != -1 and line.rfind(")") != -1],
             key=lambda line: int(line[line.rfind("(") + 1 : line.rfind(")")]),
-            reverse=True,
+            reverse=False,
         )
         sorted_data = "\n".join(sorted_lines)
         await ctx.send(name + sorted_data + f"\nテスト数: {i}")
@@ -416,7 +416,7 @@ async def my(ctx):
         sorted_lines = sorted(
             [line for line in lines if line.rfind("(") != -1 and line.rfind(")") != -1],
             key=lambda line: int(line[line.rfind("(") + 1 : line.rfind(")")]),
-            reverse=True,
+            reverse=False,
         )
         sorted_data = "\n".join(sorted_lines)
         await ctx.send(
