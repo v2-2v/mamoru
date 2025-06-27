@@ -8,6 +8,7 @@ import datetime
 import json
 import ast
 import os
+import string
 from dotenv import load_dotenv
 from pathlib import Path
 
@@ -704,6 +705,42 @@ async def sss(ctx):
     )
     channel = bot.get_channel(tukaikatachid)
     await channel.send(embed=embed)
+
+
+@bot.command()
+async def app(ctx):
+    # 個人DMでのみ動作
+    if ctx.guild is not None:
+        return
+    characters = string.ascii_lowercase + string.digits
+    random_code = ''.join(random.choice(characters) for _ in range(8))
+    text=f"です。アプリ内で連携コードを入力してください\n"
+    try:
+        with open("../data/auth.json", "r", encoding="utf-8") as file:
+            json_data = json.load(file)
+    except FileNotFoundError:
+        # ファイルが存在しない場合は空のリストで開始
+        json_data = []
+    find=False
+    for item in json_data:
+        if item["user_id"] == str(ctx.author.id):
+            find=True
+            item["code"]=random_code # コードを更新
+            item["user_name"]=str(ctx.author.name)
+            text+=f"連携コードを更新したので以前のコードは無効化されました\n"
+            break
+    if not find:
+        json_data.append({
+        "user_name": str(ctx.author.name),
+        "user_id": str(ctx.author.id),
+        "code": random_code,
+        "daily_houkoku":True
+        })
+    with open("../data/auth.json", "w", encoding="utf-8") as file:
+        json.dump(json_data, file, ensure_ascii=False, indent=4)
+    await ctx.send("連携コードは")
+    await ctx.send(random_code)
+    await ctx.send(text)
 
 
 def run_bot():

@@ -375,5 +375,111 @@ def logout():
     session.pop('guilds', None)
     return redirect(url_for('home'))
 
+
+def check_auth(code):
+    if code == "":
+        return False
+    with open("../data/auth.json", "r", encoding="utf-8") as file:
+        json_data = json.load(file)
+    for item in json_data:
+        if item["code"]==code:
+            return True
+    return False
+
+def get_user_data(code):
+    if not check_auth(code):
+        return {"ERROR":True}
+    with open("../data/auth.json", "r", encoding="utf-8") as file:
+        json_data = json.load(file)
+    for item in json_data:
+        if item["code"]==code:
+            return {
+                "ERROR":False,
+                "user_id":item["user_id"],
+                "user_name":item["user_name"],
+                "daily_houkoku":item["daily_houkoku"]
+            }
+    return {"ERROR":True}
+
+@app.route("/auth/check",methods=["POST"])
+def auth_check():
+    code = request.json.get('code', '') if request.json else ''
+    if check_auth(code):
+        return json.dumps(get_user_data(code),ensure_ascii=False,indent=4)
+    return json.dumps({"ERROR":True},ensure_ascii=False,indent=4)
+
+@app.route("/auth/operation",methods=["POST"])
+def auth_operation():
+    code = request.json.get('code', '') if request.json else ''
+    if not check_auth(code):
+        return {"ERROR":True}
+    arg2=request.json.get('arg2', '') if request.json else ''
+    arg3=request.json.get('arg3', '') if request.json else ''
+    user_data= get_user_data(code)
+    if user_data["ERROR"]==True:
+        return {"ERROR":True}
+    #こっから先は正規ユーザーだ！
+    if arg2=="get_my_task": #ここについか
+        with open('../data/task.json', 'r', encoding='utf-8') as file:
+            data = json.load(file)
+        the_data=[]
+        for task in data:
+            if user_data["user_id"] in task["user"]:
+                the_data.append({
+                "name":f"{task["task_name"]}",
+                "date":f"{task["task_date"]}"
+            })
+        sorted_data = sorted(the_data, key=lambda x: x['date'],reverse=False)
+        task_data=[]
+        for ss in sorted_data:
+            task_data.append(
+            {
+                "name":ss["name"],
+                "date":ss["date"]
+            }
+        )
+        return json.dumps(task_data,ensure_ascii=False,indent=4)
+
+    elif arg2=="get_all_task":
+        with open('../data/task.json', 'r', encoding='utf-8') as file:
+            data = json.load(file)
+        the_data=[]
+        for task in data:
+            the_data.append({
+                "name":f"{task["task_name"]}",
+                "date":f"{task["task_date"]}"
+            })
+        return json.dumps(the_data,ensure_ascii=False,indent=4)
+    
+    elif arg2=="join_new_task":
+        with open('../data/task.json', 'r', encoding='utf-8') as file:
+            data = json.load(file)
+        for task in data:
+            if task["task_name"]==arg3:
+                if user_data["user_id"] in task["user"]:
+                    return {"ERROR":True}
+                task["user"]+=str(",")+str(user_data["user_id"])
+                with open('../data/task.json', 'w', encoding='utf-8') as file:
+                    json.dump(data, file, indent=4, ensure_ascii=False)
+                return {"ERROR":False}
+        return {"ERROR":True}
+    
+    elif arg2=="delete_task":
+        with open('../data/task.json', 'r', encoding='utf-8') as file:
+            data = json.load(file)
+        for task in data:
+            if task["task_name"]==arg3:
+                if not user_data["user_id"] in task["user"]:
+                    return {"ERROR":True}
+                tasks=task["user"].split(",")
+                tasks.remove(str(user_data["user_id"]))  # リストからuser.idを消す
+                task["user"] = ",".join(map(str, tasks))  # []がないstrにする
+                with open('../data/task.json', 'w', encoding='utf-8') as file:
+                    json.dump(data, file, indent=4, ensure_ascii=False)
+                return {"ERROR":False}
+        return {"ERROR":True}
+    
+    return {"ERROR":True}
+
 if __name__ == '__main__':
     app.run(port=5100,host="0.0.0.0")
