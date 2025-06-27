@@ -726,6 +726,7 @@ async def app(ctx):
         if item["user_id"] == str(ctx.author.id):
             find=True
             item["code"]=random_code # コードを更新
+            item["user_name"]=str(ctx.author.name)
             text+=f"連携コードを更新したので以前のコードは無効化されました\n"
             break
     if not find:

@@ -375,5 +375,21 @@ def logout():
     session.pop('guilds', None)
     return redirect(url_for('home'))
 
+
+def check_auth(code):
+    if code == "":
+        return False
+    with open("../data/auth.json", "r", encoding="utf-8") as file:
+        json_data = json.load(file)
+    for item in json_data:
+        if item["code"]==code:
+            return True
+    return False
+
+@app.route("/auth/check",methods=["POST"])
+def auth_check():
+    code = request.json.get('code', '') if request.json else ''
+    return str(check_auth(code))
+
 if __name__ == '__main__':
     app.run(port=5100,host="0.0.0.0")
