@@ -733,7 +733,8 @@ async def app(ctx):
         json_data.append({
         "user_name": str(ctx.author.name),
         "user_id": str(ctx.author.id),
-        "code": random_code
+        "code": random_code,
+        "daily_houkoku":True
         })
     with open("../data/auth.json", "w", encoding="utf-8") as file:
         json.dump(json_data, file, ensure_ascii=False, indent=4)
